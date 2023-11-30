@@ -15,5 +15,5 @@
 <p>SET: 키-값 쌍을 저장합니다. : SET key value</p>
 <p>GET: 지정된 키의 값을 검색합니다. : GET key</p>
 <p>INCR: 숫자 값을 가진 키의 값을 1 증가시킵니다. : INCR key</p>
-<p>SET: 키-값 쌍을 저장합니다. : SET key value</p>
+<p>DEL: 키 해당 키값을 삭제합니다.  : DEL key</p>
 <p>EXPIRE: 키에 만료 시간(초 단위)을 설정합니다. : EXPIRE key seconds</p>
