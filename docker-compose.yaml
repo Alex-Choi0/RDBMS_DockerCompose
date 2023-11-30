@@ -1,0 +1,37 @@
+# 참고 링크 : https://hub.docker.com/_/redis
+services:
+   redis:
+      # 컨테이너의 베이스가 될 이미지를 받는다(현재 docker-compose.yaml은 mysql 8.2.0버전을 사용한다.)
+      image: redis:7.2.3
+      volumes:
+         # redis의 데이터의 초기화를 방지하기 위해 볼륨으로 저장한다.
+         - redis_data:/data
+         #- ${REDIS_DEFAULT_CONFIG_FILE}:/usr/local/etc/redis/redis.conf # redis의 config파일. {REDIS_DEFAULT_CONFIG_FILE}에서 직접 수정 가능
+      # command: redis-server /usr/local/etc/redis/redis.conf # redis.conf파일을 사용시 명령을 내린다.
+      env_file:
+         # yaml의 상대경로로 환경변수 파일을 찾는다.
+         - .redis.env
+      # 아래처럼 직접 비밀번호를 입력할수 있지만 추천하지 않음
+      #environment:
+      # - REDIS_PASSWORD=safePassword!
+      command:
+         - /bin/sh
+         - -c
+         # - Double dollars, so that the variable is not expanded by Docker Compose
+         # - Surround by quotes, so that the shell does not split the password
+         # - The ${variable:?message} syntax causes shell to exit with a non-zero
+         #   code and print a message, when the variable is not set or empty
+         - redis-server --requirepass "$${REDIS_PWD}"
+      ports:
+         # 외부에 포트를 노출시킨다. redis의 default포트는 6379이고 6380포트로 외부에 노출시킨다.
+         - "6380:6379"
+      logging:
+         driver: "json-file"
+         options:
+            max-file: "3"
+            max-size: "10m"
+
+# 네이밍 볼륨이 있을시 반드시 루트에 한번더 volumes 안에 해당 네이밍 볼륨 이름을 넣는다.
+volumes:
+   # redis은 redis_data라는 네이밍 볼륨을 사용하기 때문에 아래에 추가해준다.
+   redis_data:
