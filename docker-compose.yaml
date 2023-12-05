@@ -1,20 +1,24 @@
 # 참고 링크 : https://hub.docker.com/_/mysql
 services:
- mysql:
-  # 컨테이너의 베이스가 될 이미지를 받는다(현재 docker-compose.yaml은 mysql 8.2.0버전을 사용한다.)
-  image: mysql:8.2.0
-  volumes:
-    # mysql의 데이터의 초기화를 방지하기 위해 볼륨으로 저장한다.
-    - mysql_data:/var/lib/mysql
-  env_file:
-    # yaml의 상대경로로 환경변수 파일을 찾는다.
-    - ./.mysql.env      
-  ports:
-    # 외부에 포트를 노출시킨다. mysql의 default포트는 3306이고 4500포트로 외부에 노출시킨다.
-    - "4500:3306"
-
+   mysql:
+      # 컨테이너의 베이스가 될 이미지를 받는다(현재 docker-compose.yaml은 mysql 8.2.0버전을 사용한다.)
+      image: mysql:8.2.0
+      environment: # DB 환경을 생성한다.
+         MYSQL_DATABASE: mydatabase # mydatabase 데이터베이스를 생성한다.
+      env_file:
+         # yaml의 상대경로로 환경변수 파일을 찾는다.
+         - ./.mysql.env
+      volumes:
+         # mysql의 데이터의 초기화를 방지하기 위해 볼륨으로 저장한다.
+         - mysql_data:/var/lib/mysql
+         # mysql 서비스 정의에 init.sql 파일을 볼륨으로 마운트하는 구문을 추가.
+         # 초기화 스크립트는 MySQL 데이터 볼륨이 비어 있을 때만 실행됩니다. 이미 데이터가 있는 경우, 스크립트는 실행되지 않습니다.
+         - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      ports:
+         # 외부에 포트를 노출시킨다. mysql의 default포트는 3306이고 4500포트로 외부에 노출시킨다.
+         - "${MYSQL_PORT}:3306"
 
 # 네이밍 볼륨이 있을시 반드시 루트에 한번더 volumes 안에 해당 네이밍 볼륨 이름을 넣는다.
 volumes:
-  # mysql은 mysql_data라는 네이밍 볼륨을 사용하기 때문에 아래에 추가해준다.
-  mysql_data:
+   # mysql은 mysql_data라는 네이밍 볼륨을 사용하기 때문에 아래에 추가해준다.
+   mysql_data:
